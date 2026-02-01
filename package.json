@@ -5,6 +5,9 @@
   "author": "NumerDev",
   "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "bin": {
     "numer": "index.js"
   },
