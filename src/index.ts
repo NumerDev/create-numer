@@ -77,7 +77,7 @@ const init = async () => {
 
 
   /* 4. Get package manager */
-  const packageManager = getPackageManager(process.env.npm_config_user_agent)
+  packageManager = getPackageManager(process.env.npm_config_user_agent)
 
 
   /* 5. Should install or only scaffold */
