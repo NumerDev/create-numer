@@ -27,14 +27,14 @@ const init = async () => {
     message: "Provide a name for your project",
     defaultValue: defaultProjectName,
     validate: (value) => {
-      return !value || !transformProjectName(value).length
+      return !value || !transformTargetDir(value).length
         ? "Provide a valid project name"
         : undefined
     }
   })
 
   if (isCancel(projectName)) return exit();
-  targetDir = transformProjectName(projectName)
+  targetDir = transformTargetDir(projectName)
 
 
   /* 2. Check if target dir exists */
@@ -120,7 +120,12 @@ const exit = () => {
   process.exit(0)
 }
 
-const transformProjectName = (name: string) => name.trim().replace(/\/+$/g, "")
+const transformTargetDir = (name: string) => {
+  return name
+    .trim()
+    .replace(/[<>:"\\|?*]/g, '')
+    .replace(/\/+$/g, "")
+}
 
 const isEmpty = (path: string) => fs.readdirSync(path).length === 0
 
