@@ -1,8 +1,10 @@
-import { intro, text, isCancel, cancel, select, log } from "@clack/prompts"
+import { intro, text, isCancel, cancel, select, log, outro } from "@clack/prompts"
 import fs from "node:fs"
-import path from "node:path";
-import { fileURLToPath } from "node:url";
+import path from "node:path"
+import { fileURLToPath } from "node:url"
 import c from "picocolors"
+import spawn from "cross-spawn"
+import type { SpawnOptions } from 'node:child_process'
 
 const cwd = process.cwd();
 
@@ -114,24 +116,45 @@ const init = async () => {
   scaffoldMode = job
 
 
-  /* 6. Scaffold */
+  /* 7. Generate the project */
   const root = path.join(cwd, targetDir)
   fs.mkdirSync(root, { recursive: true })
   log.step(`Scaffolding ${c.cyan(targetDir)} in ${c.cyan(root)}`)
 
   /* Copy template files */
-  const templateDir = path.resolve(fileURLToPath(import.meta.url), "../../templates", template)
+  const templateDir = path.resolve(
+    fileURLToPath(import.meta.url),
+    "../../templates",
+    template
+  )
 
   const files = fs.readdirSync(templateDir)
   for (const file of files) {
     if (file === "package.json") continue
     copy(path.join(templateDir, file), path.join(root, file))
   }
+
+  const packageJsonPath = path.join(templateDir, "package.json")
+  const packageJson = JSON.parse(
+    fs.readFileSync(packageJsonPath, "utf-8")
+  )
+
+  packageJson.name = packageName
+  fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + '\n')
+
+  if (scaffoldMode === 'genAndInstall') {
+    log.step(`Installing dependencies with ${c.cyan(packageManager)}...`)
+    run([packageManager, "install"], {
+      stdio: 'inherit',
+      cwd: root
+    })
+  }
+
+  outro(c.greenBright("Done!"))
 }
 
 
 init()
-
 
 
 
@@ -188,5 +211,18 @@ function copyDir(srcDir: string, destDir: string) {
     const src = path.resolve(srcDir, file)
     const dest = path.resolve(destDir, file)
     copy(src, dest)
+  }
+}
+
+function run([command, ...args]: string[], options?: SpawnOptions) {
+  const { status, error } = spawn.sync(command, args, options)
+  if (status != null && status > 0) {
+    process.exit(status)
+  }
+
+  if (error) {
+    console.error(`\n${command} ${args.join(' ')} error!`)
+    console.error(error)
+    process.exit(1)
   }
 }
