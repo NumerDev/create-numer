@@ -15,6 +15,7 @@ let targetDir = defaultProjectName
 let template = "none"
 let packageManager = "npm"
 let scaffoldMode: "generate" | "genAndInstall" = "generate"
+let packageName = path.basename(path.resolve(targetDir))
 
 
 const init = async () => {
@@ -59,7 +60,27 @@ const init = async () => {
       : exit()
   }
 
-  /* 3. Choose a template */
+
+  /* 3. Get a package name if project name is invalid for it */
+  if (!isValidPackageName(packageName)) {
+    const providedPackageName = await text({
+      message: "Provide a name for your package",
+      defaultValue: toValidPackageName(packageName),
+      placeholder: toValidPackageName(packageName),
+      validate: (value) => {
+        return value && isValidPackageName(value)
+          ? "Invalid package name"
+          : undefined
+      }
+    })
+
+    if (isCancel(providedPackageName)) return exit();
+    packageName = transformTargetDir(projectName)
+  }
+
+
+
+  /* 4. Choose a template */
   const projectTemplate = await select({
     message: "Choose a template",
     options: [
@@ -67,6 +88,7 @@ const init = async () => {
       { label: "Lib + TS (🚧)", value: "none" },
     ]
   })
+
   if (isCancel(projectTemplate)) return exit();
   template = projectTemplate
 
@@ -76,11 +98,11 @@ const init = async () => {
   }
 
 
-  /* 4. Get package manager */
+  /* 5. Get package manager */
   packageManager = getPackageManager(process.env.npm_config_user_agent)
 
 
-  /* 5. Should install or only scaffold */
+  /* 6. Should install or only scaffold */
   const job = await select({
     message: "Generate project and install dependencies?",
     options: [
@@ -125,6 +147,21 @@ const transformTargetDir = (name: string) => {
     .trim()
     .replace(/[<>:"\\|?*]/g, '')
     .replace(/\/+$/g, "")
+}
+
+const isValidPackageName = (projectName: string) => {
+  return /^(?:@[a-z\d\-*~][a-z\d\-*._~]*\/)?[a-z\d\-~][a-z\d\-._~]*$/.test(
+    projectName,
+  )
+}
+
+const toValidPackageName = (projectName: string) => {
+  return projectName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/^[._]/, '')
+    .replace(/[^a-z\d\-~]+/g, '-')
 }
 
 const isEmpty = (path: string) => fs.readdirSync(path).length === 0
