@@ -44,8 +44,7 @@ const init = async () => {
      2. Check if target dir exists
   \* ----------------------------------- */
 
-  /* 2. Check if target dir exists */
-  if (fs.existsSync(targetDir) && !isEmpty(targetDir)) {
+  if (fs.existsSync(targetDir) && !isDirEmpty(targetDir)) {
     const shouldOverwrite = await select({
       message: `Target directory ${c.cyan(targetDir)} is not empty. Override?`,
       options: [
@@ -57,7 +56,7 @@ const init = async () => {
     if (isCancel(shouldOverwrite)) return exit();
 
     shouldOverwrite
-      ? fs.rmSync(targetDir, { recursive: true, force: true })
+      ? emptyDir(targetDir)
       : exit()
   }
 
@@ -273,7 +272,19 @@ const copyDir = (srcDir: string, destDir: string) => {
   }
 }
 
-function run([command, ...args]: string[], options?: SpawnOptions) {
+const emptyDir = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    return
+  }
+  for (const file of fs.readdirSync(dir)) {
+    if (file === '.git') {
+      continue
+    }
+    fs.rmSync(path.resolve(dir, file), { recursive: true, force: true })
+  }
+}
+
+const run = ([command, ...args]: string[], options?: SpawnOptions) => {
   const { status, error } = spawn.sync(command, args, options)
   if (status != null && status > 0) {
     process.exit(status)
