@@ -10,21 +10,22 @@ const cwd = process.cwd();
 
 
 /* Defaults */
-const defaultProjectName = "numer-project"
+const defaultProjectName = "project-name"
 
 /* State */
 let targetDir = defaultProjectName
 let template = "none"
-let packageManager = "npm"
+let packageManager = "pnpm"
 let scaffoldMode: "generate" | "genAndInstall" = "generate"
-let packageName = path.basename(path.resolve(targetDir))
-
+let packageName = defaultProjectName
 
 const init = async () => {
-  intro(c.bgCyan(c.black(" Hi Numer! 👋 ")))
+  intro(c.bgCyan(c.black(" Numer v0.0.0 ")));
 
 
-  /* 1. Project name */
+  /* ----------------------------------- *\
+     1. Project name
+  \* ----------------------------------- */
 
   const projectName = await text({
     message: "Provide a name for your project",
@@ -39,6 +40,9 @@ const init = async () => {
   if (isCancel(projectName)) return exit();
   targetDir = transformTargetDir(projectName)
 
+  /* ----------------------------------- *\
+     2. Check if target dir exists
+  \* ----------------------------------- */
 
   /* 2. Check if target dir exists */
   if (fs.existsSync(targetDir) && !isEmpty(targetDir)) {
@@ -52,18 +56,16 @@ const init = async () => {
 
     if (isCancel(shouldOverwrite)) return exit();
 
-    /* TODO:
-       move clearing a directory to the end of 
-       the script, so that the user can cancel the 
-       process without losing data
-    */
     shouldOverwrite
       ? fs.rmSync(targetDir, { recursive: true, force: true })
       : exit()
   }
 
 
-  /* 3. Get a package name if project name is invalid for it */
+  /* ----------------------------------- *\
+     3. Get a package name
+  \* ----------------------------------- */
+
   if (!isValidPackageName(packageName)) {
     const providedPackageName = await text({
       message: "Provide a name for your package",
@@ -81,8 +83,10 @@ const init = async () => {
   }
 
 
+  /* ----------------------------------- *\
+     4. Choose a template
+  \* ----------------------------------- */
 
-  /* 4. Choose a template */
   const projectTemplate = await select({
     message: "Choose a template",
     options: [
@@ -100,11 +104,17 @@ const init = async () => {
   }
 
 
-  /* 5. Get package manager */
+  /* ----------------------------------- *\
+     5. Get package manager
+  \* ----------------------------------- */
+
   packageManager = getPackageManager(process.env.npm_config_user_agent)
 
 
-  /* 6. Should install or only scaffold */
+  /* ----------------------------------- *\
+     6. Should install or only scaffold
+  \* ----------------------------------- */
+
   const job = await select({
     message: "Generate project and install dependencies?",
     options: [
@@ -116,7 +126,10 @@ const init = async () => {
   scaffoldMode = job
 
 
-  /* 7. Generate the project */
+  /* ----------------------------------- *\
+     7. Generate the project
+  \* ----------------------------------- */
+
   const root = path.join(cwd, targetDir)
   fs.mkdirSync(root, { recursive: true })
   log.step(`Scaffolding ${c.cyan(targetDir)} in ${c.cyan(root)}`)
@@ -154,11 +167,15 @@ const init = async () => {
 }
 
 
-init()
+init().catch(error => {
+  console.error(error)
+})
 
 
 
-/* HELPERS */
+/* ----------------------------------- *\
+   HELPERS
+\* ----------------------------------- */
 
 const exit = () => {
   cancel("Cancelled");
@@ -168,8 +185,8 @@ const exit = () => {
 const transformTargetDir = (name: string) => {
   return name
     .trim()
-    .replace(/[<>:"\\|?*]/g, '')
-    .replace(/\/+$/g, "")
+    .replace(/[<>:"\\|?*]/g, '') // Remove forbidden characters
+    .replace(/\/+$/g, "") // Remove trailing slashes
 }
 
 const isValidPackageName = (projectName: string) => {
@@ -182,12 +199,12 @@ const toValidPackageName = (projectName: string) => {
   return projectName
     .trim()
     .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/^[._]/, '')
-    .replace(/[^a-z\d\-~]+/g, '-')
+    .replace(/\s+/g, '-') // Spaces => hyphens
+    .replace(/^[._]/, '') // Remove leading dots
+    .replace(/[^a-z\d\-~]+/g, '-') // Non-alphanumeric characters => hyphens
 }
 
-const isEmpty = (path: string) => fs.readdirSync(path).length === 0
+const isDirEmpty = (path: string) => fs.readdirSync(path).length === 0
 
 const getPackageManager = (userAgent: string | undefined) => {
   if (!userAgent) return "npm"
@@ -196,7 +213,7 @@ const getPackageManager = (userAgent: string | undefined) => {
   return manager
 }
 
-function copy(src: string, dest: string) {
+const copy = (src: string, dest: string) => {
   const stat = fs.statSync(src)
   if (stat.isDirectory()) {
     copyDir(src, dest)
@@ -205,7 +222,7 @@ function copy(src: string, dest: string) {
   }
 }
 
-function copyDir(srcDir: string, destDir: string) {
+const copyDir = (srcDir: string, destDir: string) => {
   fs.mkdirSync(destDir, { recursive: true })
   for (const file of fs.readdirSync(srcDir)) {
     const src = path.resolve(srcDir, file)
