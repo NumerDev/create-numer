@@ -78,7 +78,7 @@ const init = async () => {
     })
 
     if (isCancel(providedPackageName)) return exit();
-    packageName = transformTargetDir(projectName)
+    packageName = transformTargetDir(providedPackageName)
   }
 
 
