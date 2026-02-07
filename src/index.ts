@@ -71,7 +71,7 @@ const init = async () => {
       defaultValue: toValidPackageName(packageName),
       placeholder: toValidPackageName(packageName),
       validate: (value) => {
-        return value && isValidPackageName(value)
+        return !value || isValidPackageName(value)
           ? "Invalid package name"
           : undefined
       }
