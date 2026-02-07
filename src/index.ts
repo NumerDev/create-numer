@@ -163,7 +163,49 @@ const init = async () => {
     })
   }
 
-  outro(c.greenBright("Done!"))
+
+  /* ----------------------------------- *\
+     8. Outro messages
+  \* ----------------------------------- */
+
+  const isInProjectDir = path.relative(cwd, root) !== '';
+  const isInstalled = scaffoldMode !== 'genAndInstall';
+  const outroDone = `Project created ${c.greenBright('successfully')}!`;
+  const outroInfoMessage = c.blue(`Next steps:\n`)
+
+  const outroCd = `${c.blue('cd')} ${c.cyan(targetDir)}`;
+  const outroInstall = c.blue(`${packageManager} install`);
+  const outroDev = c.blue(`${packageManager} dev`);
+  const outroTest = c.blue(`${packageManager} test`);
+
+  const outroCmd = (command: string = "", description: string = "") =>
+    `  ${c.blue(command)}\n\t${c.dim(description)}`;
+
+  interface OutroStep {
+    type: "text" | "cmd"
+    show: boolean,
+    msg?: string,
+    cmd?: string,
+    desc?: string
+  }
+
+  const outroStepps: OutroStep[] = [
+    { type: "text", msg: outroDone, show: true },
+    { type: "text", msg: outroInfoMessage, show: true },
+    { type: "cmd", cmd: outroCd, desc: "Go to project directory", show: isInProjectDir },
+    { type: "cmd", cmd: outroInstall, desc: "Install dependencies", show: isInstalled },
+    { type: "cmd", cmd: outroDev, desc: "Run development server", show: true },
+    { type: "cmd", cmd: outroTest, desc: "Run tests", show: true },
+  ]
+
+  const outroMessagee = outroStepps
+    .filter(step => step.show)
+    .map(step => step.type === "text"
+      ? step.msg
+      : outroCmd(step.cmd, step.desc)
+    ).join("\n   ")
+
+  outro(outroMessagee)
 }
 
 
