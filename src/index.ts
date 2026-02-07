@@ -151,8 +151,9 @@ const init = async () => {
     fs.readFileSync(packageJsonPath, "utf-8")
   )
 
+  /* Update package name */
   packageJson.name = packageName
-  fs.writeFileSync("package.json", JSON.stringify(packageJson, null, 2) + '\n')
+  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify(packageJson, null, 2) + '\n')
 
   if (scaffoldMode === 'genAndInstall') {
     log.step(`Installing dependencies with ${c.cyan(packageManager)}...`)
