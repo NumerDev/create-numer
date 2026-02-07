@@ -30,6 +30,7 @@ const init = async () => {
   const projectName = await text({
     message: "Provide a name for your project",
     defaultValue: defaultProjectName,
+    placeholder: defaultProjectName,
     validate: (value) => {
       return !value || !transformTargetDir(value).length
         ? "Provide a valid project name"
@@ -39,6 +40,7 @@ const init = async () => {
 
   if (isCancel(projectName)) return exit();
   targetDir = transformTargetDir(projectName)
+  packageName = path.basename(path.resolve(targetDir))
 
   /* ----------------------------------- *\
      2. Check if target dir exists
