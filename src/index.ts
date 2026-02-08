@@ -5,6 +5,8 @@ import { fileURLToPath } from "node:url"
 import c from "picocolors"
 import spawn from "cross-spawn"
 import type { SpawnOptions } from 'node:child_process'
+import { TEMPLATES } from "./templates"
+import { PackageManager, ScaffoldMode } from "./types"
 
 const cwd = process.cwd();
 
@@ -15,8 +17,8 @@ const defaultProjectName = "project-name"
 /* State */
 let targetDir = defaultProjectName
 let template = "none"
-let packageManager = "pnpm"
-let scaffoldMode: "generate" | "genAndInstall" = "generate"
+let packageManager: PackageManager = "pnpm"
+let scaffoldMode: ScaffoldMode = "generate"
 let packageName = defaultProjectName
 
 const init = async () => {
