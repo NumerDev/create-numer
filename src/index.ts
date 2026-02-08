@@ -90,10 +90,11 @@ const init = async () => {
 
   const projectTemplate = await select({
     message: "Choose a template",
-    options: [
-      { label: "React + TS + SWC", value: "react-ts-swc" },
-      { label: "Lib + TS (🚧)", value: "none" },
-    ]
+    options: TEMPLATES.map(t => ({
+      label: `${t.color(t.name)} ${c.dim(t.desc || '')}`,
+      value: t.id,
+      hint: t.hint || ''
+    }))
   })
 
   if (isCancel(projectTemplate)) return exit();

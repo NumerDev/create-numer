@@ -10,8 +10,9 @@ export const TEMPLATES: Template[] = [
   },
   {
     id: "none",
-    name: "Lib",
+    name: "Library",
     desc: "(TypeScript)",
-    color: c.yellow
+    color: c.yellow,
+    hint: "🚧 Not available yet 🚧"
   }
 ]

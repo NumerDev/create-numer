@@ -6,4 +6,5 @@ export interface Template {
   name: string,
   desc: string,
   color: (text: string | number) => string,
+  hint?: string
 }
