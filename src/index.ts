@@ -3,10 +3,18 @@ import fs from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
 import c from "picocolors"
-import spawn from "cross-spawn"
-import type { SpawnOptions } from 'node:child_process'
-import { TEMPLATES } from "./templates"
 import { PackageManager, ScaffoldMode } from "./types"
+import { getPackageNamePrompt, getProjectNamePrompt, promptScaffoldMode, promptTemplate, shouldOverwritePrompt } from "./prompts"
+import {
+  copy,
+  emptyDir,
+  exit,
+  getPackageManager,
+  isDirEmpty,
+  isValidPackageName,
+  run,
+  toValidPackageName,
+} from "./utils"
 
 const cwd = process.cwd();
 
@@ -217,88 +225,3 @@ const init = async () => {
 init().catch(error => {
   console.error(error)
 })
-
-
-
-/* ----------------------------------- *\
-   HELPERS
-\* ----------------------------------- */
-
-const exit = () => {
-  cancel("Cancelled");
-  process.exit(0)
-}
-
-const transformTargetDir = (name: string) => {
-  return name
-    .trim()
-    .replace(/[<>:"\\|?*]/g, '') // Remove forbidden characters
-    .replace(/\/+$/g, "") // Remove trailing slashes
-}
-
-const isValidPackageName = (projectName: string) => {
-  return /^(?:@[a-z\d\-*~][a-z\d\-*._~]*\/)?[a-z\d\-~][a-z\d\-._~]*$/.test(
-    projectName,
-  )
-}
-
-const toValidPackageName = (projectName: string) => {
-  return projectName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-') // Spaces => hyphens
-    .replace(/^[._]/, '') // Remove leading dots
-    .replace(/[^a-z\d\-~]+/g, '-') // Non-alphanumeric characters => hyphens
-}
-
-const isDirEmpty = (path: string) => fs.readdirSync(path).length === 0
-
-const getPackageManager = (userAgent: string | undefined) => {
-  if (!userAgent) return "npm"
-  const _specs = userAgent.split(" ")[0]
-  const manager = _specs.split("/")[0]
-  return manager
-}
-
-const copy = (src: string, dest: string) => {
-  const stat = fs.statSync(src)
-  if (stat.isDirectory()) {
-    copyDir(src, dest)
-  } else {
-    fs.copyFileSync(src, dest)
-  }
-}
-
-const copyDir = (srcDir: string, destDir: string) => {
-  fs.mkdirSync(destDir, { recursive: true })
-  for (const file of fs.readdirSync(srcDir)) {
-    const src = path.resolve(srcDir, file)
-    const dest = path.resolve(destDir, file)
-    copy(src, dest)
-  }
-}
-
-const emptyDir = (dir: string) => {
-  if (!fs.existsSync(dir)) {
-    return
-  }
-  for (const file of fs.readdirSync(dir)) {
-    if (file === '.git') {
-      continue
-    }
-    fs.rmSync(path.resolve(dir, file), { recursive: true, force: true })
-  }
-}
-
-const run = ([command, ...args]: string[], options?: SpawnOptions) => {
-  const { status, error } = spawn.sync(command, args, options)
-  if (status != null && status > 0) {
-    process.exit(status)
-  }
-
-  if (error) {
-    console.error(`\n${command} ${args.join(' ')} error!`)
-    console.error(error)
-    process.exit(1)
-  }
-}

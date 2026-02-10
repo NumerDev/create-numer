@@ -1,5 +1,5 @@
 import { text, isCancel, select } from "@clack/prompts"
-import { exit, isValidPackageName, toValidPackageName, transformTargetDir } from "."
+import { exit, isValidPackageName, toValidPackageName, transformTargetDir } from "./utils"
 import c from "picocolors"
 import { TEMPLATES } from "./templates"
 import { ScaffoldMode } from "./types"
