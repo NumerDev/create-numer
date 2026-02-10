@@ -1,4 +1,4 @@
-import { intro, text, isCancel, cancel, select, log, outro } from "@clack/prompts"
+import { intro, log, outro } from "@clack/prompts"
 import fs from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
@@ -37,39 +37,19 @@ const init = async () => {
      1. Project name
   \* ----------------------------------- */
 
-  const projectName = await text({
-    message: "Provide a name for your project",
-    defaultValue: defaultProjectName,
-    placeholder: defaultProjectName,
-    validate: (value) => {
-      return !value || !transformTargetDir(value).length
-        ? "Provide a valid project name"
-        : undefined
-    }
-  })
-
-  if (isCancel(projectName)) return exit();
-  targetDir = transformTargetDir(projectName)
+  targetDir = await getProjectNamePrompt(defaultProjectName)
   packageName = path.basename(path.resolve(targetDir))
+
 
   /* ----------------------------------- *\
      2. Check if target dir exists
   \* ----------------------------------- */
 
   if (fs.existsSync(targetDir) && !isDirEmpty(targetDir)) {
-    const shouldOverwrite = await select({
-      message: `Target directory ${c.cyan(targetDir)} is not empty. Override?`,
-      options: [
-        { label: "Yes", value: true },
-        { label: "No", value: false },
-      ]
-    })
+    const shouldOverwrite = await shouldOverwritePrompt(targetDir)
 
-    if (isCancel(shouldOverwrite)) return exit();
-
-    shouldOverwrite
-      ? emptyDir(targetDir)
-      : exit()
+    if (!shouldOverwrite) return exit();
+    emptyDir(targetDir);
   }
 
 
@@ -77,38 +57,16 @@ const init = async () => {
      3. Get a package name
   \* ----------------------------------- */
 
-  if (!isValidPackageName(packageName)) {
-    const providedPackageName = await text({
-      message: "Provide a name for your package",
-      defaultValue: toValidPackageName(packageName),
-      placeholder: toValidPackageName(packageName),
-      validate: (value) => {
-        return !value || isValidPackageName(value)
-          ? "Invalid package name"
-          : undefined
-      }
-    })
-
-    if (isCancel(providedPackageName)) return exit();
-    packageName = transformTargetDir(providedPackageName)
-  }
+  packageName = isValidPackageName(packageName)
+    ? toValidPackageName(packageName)
+    : await getPackageNamePrompt(packageName)
 
 
   /* ----------------------------------- *\
      4. Choose a template
   \* ----------------------------------- */
 
-  const projectTemplate = await select({
-    message: "Choose a template",
-    options: TEMPLATES.map(t => ({
-      label: `${t.color(t.name)} ${c.dim(t.desc || '')}`,
-      value: t.id,
-      hint: t.hint || ''
-    }))
-  })
-
-  if (isCancel(projectTemplate)) return exit();
-  template = projectTemplate
+  template = await promptTemplate()
 
   if (template === "none") {
     log.message(c.yellow("🚧 Template is not available yet 🚧"))
@@ -127,15 +85,7 @@ const init = async () => {
      6. Should install or only scaffold
   \* ----------------------------------- */
 
-  const job = await select({
-    message: "Generate project and install dependencies?",
-    options: [
-      { label: "Generate only", value: "generate" },
-      { label: "Generate and install", value: "genAndInstall" },
-    ]
-  })
-  if (isCancel(job)) return exit();
-  scaffoldMode = job
+  scaffoldMode = await promptScaffoldMode();
 
 
   /* ----------------------------------- *\
