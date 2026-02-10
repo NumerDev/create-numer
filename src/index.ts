@@ -5,24 +5,11 @@ import { fileURLToPath } from "node:url"
 import c from "picocolors"
 import { PackageManager, ScaffoldMode } from "./types"
 import { getPackageNamePrompt, getProjectNamePrompt, promptScaffoldMode, promptTemplate, shouldOverwritePrompt } from "./prompts"
-import {
-  copy,
-  emptyDir,
-  exit,
-  getPackageManager,
-  isDirEmpty,
-  isValidPackageName,
-  run,
-  toValidPackageName,
-} from "./utils"
+import { copy, emptyDir, exit, getPackageManager, isDirEmpty, isValidPackageName, run, toValidPackageName, } from "./utils"
+
 
 const cwd = process.cwd();
-
-
-/* Defaults */
 const defaultProjectName = "project-name"
-
-/* State */
 let targetDir = defaultProjectName
 let template = "none"
 let packageManager: PackageManager = "pnpm"
