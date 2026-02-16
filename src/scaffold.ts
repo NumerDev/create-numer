@@ -27,7 +27,6 @@ export const scaffoldProject = (config: ProjectConfig, cwd: string) => {
 }
 
 
-
 const updatePackageJson = (root: string, templateDir: string, packageName: string) => {
   const packageJsonPath = path.join(templateDir, "package.json")
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"))
@@ -39,6 +38,7 @@ const updatePackageJson = (root: string, templateDir: string, packageName: strin
     JSON.stringify(packageJson, null, 2) + "\n"
   )
 }
+
 
 export const installDependencies = (root: string, packageManager: string) => {
   return run([packageManager, "install"], {
