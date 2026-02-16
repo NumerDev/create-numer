@@ -52,6 +52,7 @@ export const getPackageNamePrompt = async (defaultName: string): Promise<string>
   return result
 }
 
+
 export const promptTemplate = async (): Promise<string> => {
   const result = await select({
     message: "Choose a template",
@@ -65,6 +66,7 @@ export const promptTemplate = async (): Promise<string> => {
   if (isCancel(result)) return exit();
   return result
 }
+
 
 export const promptScaffoldMode = async (): Promise<ScaffoldMode> => {
   const result = await select({
