@@ -1,11 +1,11 @@
 import { intro, log, outro } from "@clack/prompts"
 import fs from "node:fs"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 import c from "picocolors"
-import { PackageManager, ScaffoldMode } from "./types"
+import { PackageManager, ProjectConfig, ScaffoldMode } from "./types"
 import { getPackageNamePrompt, getProjectNamePrompt, promptScaffoldMode, promptTemplate, shouldOverwritePrompt } from "./prompts"
-import { copy, emptyDir, exit, getPackageManager, isDirEmpty, isValidPackageName, run, toValidPackageName, } from "./utils"
+import { emptyDir, exit, getPackageManager, isDirEmpty, isValidPackageName, toValidPackageName, } from "./utils"
+import { installDependencies, scaffoldProject } from "./scaffold"
 
 
 const cwd = process.cwd();
@@ -79,38 +79,21 @@ const init = async () => {
      7. Generate the project
   \* ----------------------------------- */
 
-  const root = path.join(cwd, targetDir)
-  fs.mkdirSync(root, { recursive: true })
-  log.step(`Scaffolding ${c.cyan(targetDir)} in ${c.cyan(root)}`)
-
-  /* Copy template files */
-  const templateDir = path.resolve(
-    fileURLToPath(import.meta.url),
-    "../../templates",
-    template
-  )
-
-  const files = fs.readdirSync(templateDir)
-  for (const file of files) {
-    if (file === "package.json") continue
-    copy(path.join(templateDir, file), path.join(root, file))
+  const config: ProjectConfig = {
+    targetDir,
+    packageName,
+    template,
+    packageManager,
+    scaffoldMode,
   }
 
-  const packageJsonPath = path.join(templateDir, "package.json")
-  const packageJson = JSON.parse(
-    fs.readFileSync(packageJsonPath, "utf-8")
-  )
+  log.step(`Scaffolding ${c.cyan(targetDir)}`)
 
-  /* Update package name */
-  packageJson.name = packageName
-  fs.writeFileSync(path.join(root, "package.json"), JSON.stringify(packageJson, null, 2) + '\n')
+  const root = scaffoldProject(config, cwd)
 
-  if (scaffoldMode === 'genAndInstall') {
-    log.step(`Installing dependencies with ${c.cyan(packageManager)}...`)
-    run([packageManager, "install"], {
-      stdio: 'inherit',
-      cwd: root
-    })
+  if (config.scaffoldMode === 'genAndInstall') {
+    log.step(`Installing dependencies with ${c.cyan(config.packageManager)}...`)
+    installDependencies(root, config.packageManager)
   }
 
 
