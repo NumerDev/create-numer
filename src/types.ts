@@ -8,3 +8,12 @@ export interface Template {
   color: (text: string | number) => string,
   hint?: string
 }
+
+export interface ProjectConfig {
+  targetDir: string
+  packageName: string
+  template: string
+  packageManager: PackageManager
+  scaffoldMode: ScaffoldMode
+  shouldOverwrite?: boolean
+}
