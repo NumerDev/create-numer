@@ -1,0 +1,17 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  border-radius: 50%;
+  overflow: hidden;
+  height: 15em;
+  transition: box-shadow 0.3s ease-in-out;
+
+  &:hover {
+    box-shadow: 0 0 3em #646cffaa;
+  }
+}
