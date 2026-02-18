@@ -1,6 +1,6 @@
-import react from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
-import { dependencies } from "./package.json";
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import { dependencies } from './package.json';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -10,7 +10,7 @@ export default defineConfig({
   resolve: {
     /*
       Dedupe all duplicated dependencies to prevent multiple
-      transformations of the same dependency. 
+      transformations of the same dependency.
     */
     dedupe: [...Object.keys(dependencies)],
   },
