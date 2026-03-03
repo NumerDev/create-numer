@@ -1,3 +1,6 @@
 # React + TypeScript + Vite
 
-Minimal React + TypeScript + Vite template, with:
+Minimal react template, with:
+- React 19
+- Typescript
+- Vite 8 beta with Rolldown
