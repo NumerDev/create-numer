@@ -3,9 +3,9 @@ import c from "picocolors"
 
 export const TEMPLATES: Template[] = [
   {
-    id: "react-ts-swc",
+    id: "react-ts",
     name: "React",
-    desc: "(TypeScript + SWC)",
+    desc: "(TypeScript + Vite 8 + Rolldown)",
     color: c.blue
   },
   {
