@@ -15,4 +15,12 @@ export default defineConfig({
     dedupe: [...Object.keys(dependencies)],
   },
   plugins: [react()],
+  build: {
+    rolldownOptions: {
+      experimental: {
+        // Experimental - if it causing issues, disable it
+        lazyBarrel: true,
+      },
+    },
+  },
 });
