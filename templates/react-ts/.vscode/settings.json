@@ -10,17 +10,18 @@
   },
 
   // Silent the stylistic rules in your IDE, but still auto fix them
+  // I personally prefer to show the errors in the editor so they are commented out | Numer
   "eslint.rules.customizations": [
-    { "rule": "style/*", "severity": "off", "fixable": true },
-    { "rule": "format/*", "severity": "off", "fixable": true },
-    { "rule": "*-indent", "severity": "off", "fixable": true },
-    { "rule": "*-spacing", "severity": "off", "fixable": true },
-    { "rule": "*-spaces", "severity": "off", "fixable": true },
-    { "rule": "*-order", "severity": "off", "fixable": true },
-    { "rule": "*-dangle", "severity": "off", "fixable": true },
-    { "rule": "*-newline", "severity": "off", "fixable": true },
-    { "rule": "*quotes", "severity": "off", "fixable": true },
-    { "rule": "*semi", "severity": "off", "fixable": true }
+    // { "rule": "style/*", "severity": "off", "fixable": true },
+    // { "rule": "format/*", "severity": "off", "fixable": true },
+    // { "rule": "*-indent", "severity": "off", "fixable": true },
+    // { "rule": "*-spacing", "severity": "off", "fixable": true },
+    // { "rule": "*-spaces", "severity": "off", "fixable": true },
+    // { "rule": "*-order", "severity": "off", "fixable": true },
+    // { "rule": "*-dangle", "severity": "off", "fixable": true },
+    // { "rule": "*-newline", "severity": "off", "fixable": true },
+    // { "rule": "*quotes", "severity": "off", "fixable": true },
+    // { "rule": "*semi", "severity": "off", "fixable": true }
   ],
 
   // Enable eslint for all supported languages
@@ -29,14 +30,23 @@
     "javascriptreact",
     "typescript",
     "typescriptreact",
+    "vue",
     "html",
     "markdown",
     "json",
+    "json5",
     "jsonc",
     "yaml",
     "toml",
     "xml",
+    "gql",
+    "graphql",
+    "astro",
+    "svelte",
     "css",
-    "scss"
+    "less",
+    "scss",
+    "pcss",
+    "postcss"
   ]
 }
