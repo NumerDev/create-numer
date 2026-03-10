@@ -17,6 +17,7 @@
     "dist"
   ],
   "scripts": {
+    "type-check": "tsc --noEmit",
     "dev": "tsdown --watch",
     "build": "tsdown"
   },
