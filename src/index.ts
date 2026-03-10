@@ -6,6 +6,7 @@ import { PackageManager, ProjectConfig, ScaffoldMode } from "./types"
 import { getPackageNamePrompt, getProjectNamePrompt, promptScaffoldMode, promptTemplate, shouldOverwritePrompt } from "./prompts"
 import { emptyDir, exit, getPackageManager, isDirEmpty, isValidPackageName, toValidPackageName, } from "./utils"
 import { installDependencies, scaffoldProject } from "./scaffold"
+import { fileURLToPath } from "node:url"
 
 
 const cwd = process.cwd();
@@ -16,8 +17,17 @@ let packageManager: PackageManager = "pnpm"
 let scaffoldMode: ScaffoldMode = "generate"
 let packageName = defaultProjectName
 
+const pkgJson = JSON.parse(
+  fs.readFileSync(
+    path.resolve(
+      fileURLToPath(import.meta.url),
+      "../../package.json",
+    ),
+    'utf-8')
+);
+
 const init = async () => {
-  intro(c.bgCyan(c.black(" Numer v0.0.0 ")));
+  intro(c.bgCyan(c.black(` create-numer v${pkgJson.version}`)));
 
 
   /* ----------------------------------- *\
