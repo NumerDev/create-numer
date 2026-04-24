@@ -10,6 +10,7 @@ export default mergeConfig(viteConfig, defineConfig({
     setupFiles: './src/config/setupTests.tsx',
 
     coverage: {
+      enabled: true,
       provider: 'v8',
       reporter: ['text', 'html'],
       exclude: ['node_modules', 'src/config'],
